@@ -15,10 +15,26 @@ strong {
     font-weight: 500;
 }
 
+.ui-menu-option:not(.is-divider) {
+    font-size: 14px;
+    min-height: 36px;
+    cursor: default;
+}
+
+.ui-menu-option__content {
+    height: 36px;
+    padding: 0 16px;
+}
+
+.ui-button__dropdown-icon {
+    display: none;
+}
+
 #app {
     display: flex;
     flex-direction: column;
-    padding-bottom: 31px; /* For absolutely positioned status bar at the bottom */
+    /* For absolutely positioned status bar at the bottom */
+    padding-bottom: 31px;
 }
 
 .input-wrapper {
@@ -38,9 +54,22 @@ strong {
     flex-grow: 1;
 }
 
-.download-button {
-    border-radius: 0 2px 2px 0!important;
+.download-button,
+.download-options-button {
     cursor: default;
+}
+
+.download-button {
+    border-radius: 0!important;
+}
+
+.download-options-button {
+    border-left: 1px solid #0c7cd5;
+    border-radius: 0 2px 2px 0!important;
+    border-radius: 0 2px 2px 0!important;
+    min-width: 32px;
+    padding-left: 8px;
+    padding-right: 8px;
 }
 
 .status-bar {

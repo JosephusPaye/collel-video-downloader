@@ -16,7 +16,16 @@
     <div id="app" v-cloak>
         <div class="input-wrapper">
             <input type="text" v-model="input" class="input" placeholder="Enter video link" autofocus>
-            <ui-button class="download-button" color="primary" @click="download" :loading="fetchingInfo">Download</ui-button>
+            <ui-button class="download-button" color="primary" @click="download()" :loading="fetchingInfo">Download</ui-button>
+            <ui-button class="download-options-button" color="primary" has-dropdown ref="downloadOptionsButton" :disabled="fetchingInfo">
+                <svg width="24px" height="24px" viewBox="0 0 24 24">
+                    <path fill="#fff" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                </svg>
+                <ui-menu
+                    contain-focus slot="dropdown" :options="downloadOptionsMenu" @close="$refs.downloadOptionsButton.closeDropdown()"
+                    @select="onDownloadOptionSelect"
+                ></ui-menu>
+            </ui-button>
         </div>
 
         <table class="table table-striped table-responsive downloads">

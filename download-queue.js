@@ -27,7 +27,7 @@ module.exports = class DownloadQueue {
         item.status = 'Requesting';
         this.downloadInProgress = true;
 
-        youtubeDl.download(item.url, { filename: item.filename + '.part', directory: this.downloadDirectory })
+        youtubeDl.download(item.url, { filename: item.filename + '.part', directory: this.downloadDirectory, args: item.args || [] })
             .on('info', info => {
                 item.status = 'Downloading';
                 item.size = info.size;
