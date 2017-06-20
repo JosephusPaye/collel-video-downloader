@@ -1,0 +1,23 @@
+{
+  "name": "downloader",
+  "version": "1.0.0",
+  "main": "main.js",
+  "author": "Josephus Paye II",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "dependencies": {
+    "humanize-duration": "^3.10.0",
+    "keen-ui": "^1.0.0",
+    "pretty-bytes": "^4.0.2",
+    "progress-stream": "^2.0.0",
+    "shortid": "^2.2.8",
+    "vue": "^2.1.7",
+    "youtube-dl": "^1.11.1"
+  },
+  "devDependencies": {
+    "electron": "^1.6.11"
+  }
+}

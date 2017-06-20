@@ -1,0 +1,67 @@
+* {
+	box-sizing: border-box;
+	font-family: Segoe UI, sans-serif;
+}
+
+html,
+body {
+	margin: 0;
+	padding 0;
+	width: 100vw;
+	height: 100vh;
+}
+
+#app {
+	display: flex;
+	flex-direction: column;
+}
+
+.input-wrapper {
+	border-bottom: 1px solid #DDD;
+	padding: 8px;
+	display: flex;
+	background-color: #EEE;
+}
+
+.input {
+	display: block;
+	border: 1px solid #AAA;
+	border-right: 0;
+	padding: 8px;
+	font-size: 16px;
+	height: 36px;
+	flex-grow: 1;
+}
+
+.download-button {
+    border-radius: 0 2px 2px 0!important;
+}
+
+.downloads {
+	margin: 0;
+	font-size: 14px;
+}
+
+.download-index {
+	width: 32px;
+}
+
+.download-filename {
+	width: 32%;
+}
+
+.download-filesize {
+	width: 106px;
+}
+
+.download-progress {
+    width: 32%;
+}
+
+.download-speed {
+	width: 106px;
+}
+
+.download-eta {
+	width: 106px;
+}

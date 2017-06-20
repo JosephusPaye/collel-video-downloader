@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Video Downloader</title>
+    <link rel="stylesheet" href="node_modules/keen-ui/dist/keen-ui.min.css">
+    <link rel="stylesheet" href="table.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        *[v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" v-cloak>
+        <div class="input-wrapper">
+            <input type="text" v-model="input" class="input" placeholder="Paste video link here">
+            <ui-button class="download-button" color="primary" @click="download" :loading="fetchingInfo">Download</ui-button>
+        </div>
+
+        <table class="table table-striped table-responsive downloads">
+            <thead>
+                <tr>
+                    <th class="download-index">#</th>
+                    <th class="download-filename">Name</th>
+                    <th class="download-filesize">Size</th>
+                    <th class="download-progress">Progress</th>
+                    <th class="download-speed">Speed</th>
+                    <th class="download-eta">ETA</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr v-for="(download, index) in downloads">
+                    <td class="download-index">{{ index + 1 }}</td>
+                    <td class="download-filename">{{ download.filename }}</td>
+                    <td class="download-filesize">{{ download.filesize | prettyBytes }}</td>
+                    <td class="download-progress">
+                        <ui-progress-linear type="determinate" :progress="download.progress"></ui-progress-linear>
+                        <span class="download-progress-value">{{ download.status + ' ' + download.progress }}%</span>
+                    </td>
+                    <td class="download-speed">{{ download.speed | prettySpeed }}</td>
+                    <td class="download-eta">{{ download.eta | prettyDuration }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="node_modules/vue/dist/vue.js"></script>
+    <script src="node_modules/keen-ui/dist/keen-ui.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
