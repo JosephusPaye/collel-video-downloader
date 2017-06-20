@@ -1,17 +1,18 @@
 table {
-  border-collapse: collapse;
+    border-collapse: collapse;
 }
 
 caption {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  color: #636c72;
-  text-align: left;
-  caption-side: bottom;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    color: #636c72;
+    text-align: left;
+    caption-side: bottom;
 }
 
 th {
-  text-align: left;
+    text-align: left;
+    font-weight: 500;
 }
 
 .table {
@@ -181,7 +182,6 @@ th {
         display: block;
         width: 100%;
         overflow-x: auto;
-        -ms-overflow-style: -ms-autohiding-scrollbar;
     }
 
     .table-responsive.table-bordered {
@@ -189,6 +189,7 @@ th {
     }
 }
 
+/*
 .table-fixed tbody {
     display: block;
     overflow: auto;
@@ -200,7 +201,4 @@ th {
     width: 100%;
     table-layout: fixed;
 }
-
-.table-fixed thead {
-    /*width: calc(100% - 1em);*/
-}
+*/

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="table.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        *[v-cloak] {
+        [v-cloak] {
             display: none;
         }
     </style>
@@ -15,7 +15,7 @@
 <body>
     <div id="app" v-cloak>
         <div class="input-wrapper">
-            <input type="text" v-model="input" class="input" placeholder="Paste video link here">
+            <input type="text" v-model="input" class="input" placeholder="Enter video link" autofocus>
             <ui-button class="download-button" color="primary" @click="download" :loading="fetchingInfo">Download</ui-button>
         </div>
 
@@ -32,19 +32,37 @@
             </thead>
 
             <tbody>
-                <tr v-for="(download, index) in downloads">
+                <tr v-for="(download, index) in downloads" :key="download.url">
                     <td class="download-index">{{ index + 1 }}</td>
                     <td class="download-filename">{{ download.filename }}</td>
-                    <td class="download-filesize">{{ download.filesize | prettyBytes }}</td>
+                    <td class="download-filesize">{{ download.size | prettyBytes }}</td>
                     <td class="download-progress">
                         <ui-progress-linear type="determinate" :progress="download.progress"></ui-progress-linear>
-                        <span class="download-progress-value">{{ download.status + ' ' + download.progress }}%</span>
+                        <span class="download-progress-value">
+                            <span>{{ download.status }}</span> <span>{{ download.progress | prettyPercentage }}</span>
+                        </span>
                     </td>
                     <td class="download-speed">{{ download.speed | prettySpeed }}</td>
                     <td class="download-eta">{{ download.eta | prettyDuration }}</td>
                 </tr>
+
+                <tr v-if="downloads.length === 0"><td colspan="6" class="download-placeholder">No downloads. Enter a link in the box above and click <strong>Download</strong> to begin.</td></tr>
             </tbody>
         </table>
+
+        <div class="status-bar">
+            <div class="status-bar-left">
+                <span>
+                    Download folder: <a @click="openDownloadDirectory" title="Click to open">{{ downloadDirectory }}</a>
+                    [<a @click="changeDownloadDirectory" title="Click to change download folder">Change</a>]
+                </span>
+            </div>
+
+            <div class="status-bar-right">
+                <!-- <a @click="updateYoutubeDl">Update downloader</a> -->
+                <a @click="clearCompletedDownloads">Clear completed</a>
+            </div>
+        </div>
     </div>
 
     <script src="node_modules/vue/dist/vue.js"></script>

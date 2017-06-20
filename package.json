@@ -9,6 +9,7 @@
     "start": "electron ."
   },
   "dependencies": {
+    "electron-store": "^1.1.0",
     "humanize-duration": "^3.10.0",
     "keen-ui": "^1.0.0",
     "pretty-bytes": "^4.0.2",

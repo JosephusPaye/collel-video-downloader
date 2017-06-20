@@ -1,57 +1,89 @@
 * {
-	box-sizing: border-box;
-	font-family: Segoe UI, sans-serif;
+    box-sizing: border-box;
+    font-family: Segoe UI, sans-serif;
 }
 
 html,
 body {
-	margin: 0;
-	padding 0;
-	width: 100vw;
-	height: 100vh;
+    margin: 0;
+    padding 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+strong {
+    font-weight: 500;
 }
 
 #app {
-	display: flex;
-	flex-direction: column;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 31px; /* For absolutely positioned status bar at the bottom */
 }
 
 .input-wrapper {
-	border-bottom: 1px solid #DDD;
-	padding: 8px;
-	display: flex;
-	background-color: #EEE;
+    border-bottom: 1px solid #DDD;
+    padding: 8px;
+    display: flex;
+    background-color: #EEE;
 }
 
 .input {
-	display: block;
-	border: 1px solid #AAA;
-	border-right: 0;
-	padding: 8px;
-	font-size: 16px;
-	height: 36px;
-	flex-grow: 1;
+    display: block;
+    border: 1px solid #AAA;
+    border-right: 0;
+    padding: 8px;
+    font-size: 15px;
+    height: 36px;
+    flex-grow: 1;
 }
 
 .download-button {
     border-radius: 0 2px 2px 0!important;
+    cursor: default;
+}
+
+.status-bar {
+    background-color: #EEE;
+    border-top: 1px solid #DDD;
+    bottom: 0;
+    display: flex;
+    font-size: 13px;
+    margin-top: auto;
+    padding: 6px 10px;
+    position: absolute;
+    width: 100%;
+}
+
+.status-bar a {
+    text-decoration: none;
+    color: #0c7cd5;
+    cursor: pointer;
+}
+
+.status-bar a:hover {
+    text-decoration: underline;
+}
+
+.status-bar-right {
+    margin-left: auto;
 }
 
 .downloads {
-	margin: 0;
-	font-size: 14px;
+    margin: 0;
+    font-size: 14px;
 }
 
 .download-index {
-	width: 32px;
+    width: 32px;
 }
 
 .download-filename {
-	width: 32%;
+    width: 32%;
 }
 
 .download-filesize {
-	width: 106px;
+    width: 106px;
 }
 
 .download-progress {
@@ -59,9 +91,13 @@ body {
 }
 
 .download-speed {
-	width: 106px;
+    width: 106px;
 }
 
 .download-eta {
-	width: 106px;
+    width: 106px;
+}
+
+.download-placeholder {
+    text-align: center;
 }

@@ -4,23 +4,32 @@ const shortId = require('shortid');
 const progress = require('progress-stream');
 const youtubeDl = require('youtube-dl');
 
-const defaultDirectory = path.join(__dirname, 'downloads');
+const defaultOptions = {
+    directory: path.join(__dirname, 'downloads'),
+    args: []
+};
 
 /**
  * Download the video at the given URL
  *
- * @param  {String} url       The URL of the video
- * @param  {String} directory The path to set as youtube-dl's working directory
- * @param  {Array}  args      Args to pass to youtube-dl. Format: ['--format=22', '...']
- * @return {Stream}           The download progress stream
+ * @param  {String} url                 The URL of the video
+ * @param  {String} options.directory   The path to set as youtube-dl's working directory
+ * @param  {String} options.filename    The output filename
+ * @param  {Array}  options.args        Args to pass to youtube-dl. Format: ['--format=22', '...']
+ * @return {Stream}                     The download progress stream
  */
-function download(url, directory = defaultDirectory, args = []) {
-    const execOptions = { cwd: directory };
-    const downloadPath = path.join(directory, shortId.generate() + '.part');
+function download(url, options = {}) {
+    options = Object.assign({}, defaultOptions, options);
+
+    const execOptions = { cwd: options.directory };
+    const downloadPath = path.join(
+        options.directory,
+        options.filename ? options.filename : (shortId.generate() + '.part')
+    );
 
     const progressStream = progress({ time: 300 });
     const fileStream = fs.createWriteStream(downloadPath);
-    const downloadStream = youtubeDl(url, args, execOptions);
+    const downloadStream = youtubeDl(url, options.args, execOptions);
 
     let hasDownloadError = false;
     let filename = '';
@@ -73,11 +82,13 @@ function download(url, directory = defaultDirectory, args = []) {
         }
 
         // Rename the file to it's actual name
-        fs.rename(downloadPath, path.join(directory, filename), err => {
+        const newName = path.join(options.directory, filename);
+
+        fs.rename(downloadPath, newName, err => {
             if (err) {
                 console.error('Error renaming downloaded file', err);
             } else {
-                progressStream.emit('file-renamed');
+                progressStream.emit('file-renamed', newName);
             }
         });
     });
@@ -92,38 +103,39 @@ function download(url, directory = defaultDirectory, args = []) {
  * Get the info of the video at the given url
  *
  * @param  {String} url       The URL of the video
- * @param  {String} directory The path to set as youtube-dl's working directory
  * @param  {Array}  args      Args to pass to youtube-dl. Format: ['--format=22', '...']
  * @return {Promise}
  */
 function getInfo(url, args = []) {
     return new Promise((resolve, reject) => {
-        youtubeDl.getInfo(url, args, function(err, info) {
+        youtubeDl.getInfo(url, args, (err, info) => {
             if (err) {
                 return reject(err);
             }
 
-			console.log(info);
-
-            resolve({
-            	id: info.id,
-            	title: info.title,
-            	url: info.webpage_url,
-            	fileurl: info.url,
-            	thumbnail: info.thumbnail,
-            	description: info.description,
-            	filename: info._filename,
-            	extension: info.ext,
-            	format: {
-            		id: info.format_id,
-            		note: info.format_note,
-            		resolution: info.width + 'x' + info.height
-            	},
-            	site: info.extractor_key,
-            	uploader: info.uploader,
-            	uploaderUrl: info.uploader_url,
-            	duration: info.duration,
+            const transformed = [].concat(info).map(video => {
+                return {
+                    id: video.id,
+                    title: video.title,
+                    url: video.webpage_url,
+                    fileurl: video.url,
+                    thumbnail: video.thumbnail,
+                    description: video.description,
+                    filename: video._filename,
+                    extension: video.ext,
+                    format: {
+                        id: video.format_id,
+                        note: video.format_note,
+                        resolution: video.width + 'x' + video.height
+                    },
+                    site: video.extractor_key,
+                    uploader: video.uploader,
+                    uploaderUrl: video.uploader_url,
+                    duration: video.duration
+                };
             });
+
+            resolve(transformed.length > 1 ? transformed : transformed[0]);
         });
     });
 }
@@ -131,7 +143,7 @@ function getInfo(url, args = []) {
 // download('https://www.youtube.com/watch?v=dxWvtMOGAhw')
 //     .on('info', info => { console.log('Downloading:', info._filename); })
 //     .on('progress', p => { console.log(p.percentage); })
-//     .on('finish', () => { console.log('Finished now yaya'); })
+//     .on('finish', () => { console.log('Finished'); })
 //     .on('part-file-deleted', () => { console.log('Cleaned up after error'); })
 //     .on('file-renamed', () => { console.log('Renamed'); })
 //     .on('error', err => { console.log('Error', JSON.stringify(err, null, '  ')) });
