@@ -1,12 +1,13 @@
+const aboutWindow = require('./about-window');
+const downloadAction = require('./download-actions');
 const downloader = require('./downloader');
 const DownloadQueue = require('./download-queue');
 const humanizer = require('./humanizer');
-const path = require('path');
-const Store = require('electron-store');
-const url = require('url');
-const youtubeDl = require('./youtube-dl');
 const menu = require('./menus');
-const { remote, shell, clipboard } = require('electron');
+const shortId = require('shortid');
+const Store = require('electron-store');
+const youtubeDl = require('./youtube-dl');
+const { remote, clipboard, ipcRenderer } = require('electron');
 
 const store = new Store();
 const appDataDirectory = remote.app.getPath('userData');
@@ -29,6 +30,14 @@ const vm = new Vue({
                 type: 'progress',
                 shown: false,
                 message: ''
+            },
+            contextMenus: {
+                'Connecting...': 'downloadConnecting',
+                'Queued': 'downloadQueued',
+                'Downloading': 'downloadInProgress',
+                'Complete': 'downloadComplete',
+                'Error': 'downloadError',
+                'Cancelled': 'downloadCancelled'
             }
         };
     },
@@ -44,17 +53,11 @@ const vm = new Vue({
                     this.showErrorOverlay('An error occurred while setting up. Please check your internet connection and restart Video Downloader.');
                 });
         }
+
+        ipcRenderer.on('context-menu-item-selected', this.onContextMenuItemSelect);
     },
 
     methods: {
-        onDownloadOptionSelect(option) {
-            if (option.id === 'download-audio') {
-                this.downloadAudio();
-            } else if (option.id === 'get-url') {
-                this.getVideoUrl();
-            }
-        },
-
         download(args = []) {
             if (this.input.trim().length === 0) {
                 return;
@@ -74,10 +77,14 @@ const vm = new Vue({
         },
 
         downloadAudio() {
-            this.download(['--format=140']);
+            this.download(['-f=bestaudio/mp3/m4a/140']);
         },
 
         getVideoUrl() {
+            if (this.input.trim().length === 0) {
+                return;
+            }
+
             this.fetchingInfo = true;
 
             downloader.getInfo(this.input)
@@ -93,7 +100,10 @@ const vm = new Vue({
 
         addDownload(videoInfo, args = []) {
             const video = {
+                uid: shortId.generate(),
                 status: 'Queued',
+                isCancelled: false,
+                hasError: false,
                 filename: videoInfo.filename,
                 filepath: '',
                 size: '-',
@@ -112,8 +122,7 @@ const vm = new Vue({
         showUrlSuccess(info) {
             this.showDialog(
                 'Video URL copied',
-                'Download URL for video "' + info.title + '" has been copied to the clipboard.',
-                { type: 'info' }
+                'Download URL for video "' + info.title + '" has been copied to the clipboard.', { type: 'info' }
             );
         },
 
@@ -121,8 +130,7 @@ const vm = new Vue({
             console.error('Error getting video info', err);
             this.showDialog(
                 'Link error',
-                'No video found for the link entered. Check the link for errors.\nIf the link is correct, update the downloader from the Settings menu and try again.',
-                { type: 'warning' }
+                'No video found for the link entered. Check the link for errors.\nIf the link is correct, update the downloader from the Settings menu and try again.', { type: 'warning' }
             );
         },
 
@@ -134,6 +142,25 @@ const vm = new Vue({
             }
         },
 
+        onDownloadOptionSelect(option) {
+            if (option.id === 'download-audio') {
+                this.downloadAudio();
+            } else if (option.id === 'get-url') {
+                this.getVideoUrl();
+            }
+        },
+
+        onContextMenu(item) {
+            ipcRenderer.send('show-context-menu', {
+                downloadId: item.uid,
+                menuId: this.contextMenus[item.status]
+            });
+        },
+
+        onContextMenuItemSelect(event, data) {
+            downloadAction.handle(data, this.downloads, downloadQueue);
+        },
+
         updateYoutubeDl() {
             this.showProgressOverlay('Updating downloader. Please wait.');
 
@@ -142,9 +169,7 @@ const vm = new Vue({
                     this.hideMessageOverlay();
 
                     const title = result.updated ? 'Downloader updated' : 'Up to date';
-                    const message = result.updated
-                        ? 'Downloader was updated to version ' + result.version + '.'
-                        : 'Downloader is already up to date. Current version: ' + result.version + '.'
+                    const message = result.updated ? 'Downloader was updated to version ' + result.version + '.' : 'Downloader is already up to date. Current version: ' + result.version + '.'
 
                     this.showDialog(title, message);
                 })
@@ -154,24 +179,17 @@ const vm = new Vue({
 
                     this.showDialog(
                         'Update error',
-                        'An error occurred while updating the downloader. Please check your internet connection and try again.',
-                        { type: 'warning'}
+                        'An error occurred while updating the downloader. Please check your internet connection and try again.', { type: 'warning' }
                     );
                 });
         },
 
         showAbout() {
-            const aboutWindow = new remote.BrowserWindow({ title: 'About Video Downloader', width: 340, height: 175, autoHideMenuBar: true });
-
-            aboutWindow.loadURL(url.format({
-                pathname: path.join(__dirname, 'about.html'),
-                protocol: 'file:',
-                slashes: true
-            }));
+            aboutWindow.show();
         },
 
         openDownloadDirectory() {
-            shell.openExternal(this.downloadDirectory);
+            ipcRenderer.send('open-item', this.downloadDirectory);
         },
 
         changeDownloadDirectory() {
@@ -192,20 +210,18 @@ const vm = new Vue({
         },
 
         clearCompletedDownloads() {
-            this.downloads = this.downloads.filter(d => d.status !== 'Complete');
+            this.downloads = this.downloads.filter(d => {
+                // Remove downloads that are complete, cancelled or have errors
+                return d.status !== 'Complete' && d.status !== 'Error' && d.status !== 'Cancelled';
+            });
         },
 
         showDialog(title, message, options = {}) {
-            // Give the DOM time to update before showing the dialog,
-            // since the dialog blocks the renderer. Tried $nextTick, but it
-            // doesn't achieve the desired effect
-            setTimeout(() => {
-                remote.dialog.showMessageBox({
-                    type: options.type || 'info',
-                    title: title,
-                    detail: message
-                });
-            }, 300);
+            remote.dialog.showMessageBox({
+                type: options.type || 'info',
+                title: title,
+                detail: message
+            }, () => {});
         },
 
         showProgressOverlay(message) {

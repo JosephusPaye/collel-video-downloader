@@ -33,6 +33,7 @@ function download(url, options = {}) {
     const downloadStream = youtubeDl(url, options.args, execOptions);
 
     let hasDownloadError = false;
+    let wasCancelled = false;
     let filename = '';
 
     // Emitted when the video info is initially retrieved
@@ -40,14 +41,14 @@ function download(url, options = {}) {
         // Set the filename for later rename
         filename = info._filename;
 
-        // Set the length (for the progress to work) and emit the info
+        // Set the length (for the progress stream to work) and emit the info
         progressStream.setLength(info.size);
-        progressStream.emit('info', info);
+        progressStream.emit('info', info, downloadPath);
     });
 
     // Emitted on error from youtube-dl or http download
     downloadStream.on('error', err => {
-        // Set the error status, for cleanup
+        // Set the error status (for later clean up)
         hasDownloadError = true;
 
         // Emit the error and close the file stream
@@ -69,8 +70,8 @@ function download(url, options = {}) {
     // Emitted when the file stream is closed, either when the download is complete
     // or when there was an error downloading
     fileStream.on('finish', () => {
-        // Clean up if there was an error
-        if (hasDownloadError) {
+        // Clean up if there was an error or the download was aborted
+        if (hasDownloadError || wasCancelled) {
             fs.unlink(downloadPath, err => {
                 if (err) {
                     console.error('Error deleting part download file', err);
@@ -82,7 +83,7 @@ function download(url, options = {}) {
             return;
         }
 
-        // Rename the file to it's actual name
+        // The download was successful, rename the file to it's actual name
         const newName = path.join(options.directory, filename);
 
         fs.rename(downloadPath, newName, err => {
@@ -93,6 +94,19 @@ function download(url, options = {}) {
             }
         });
     });
+
+    // Manually abort the download
+    progressStream.cancel = function cancel() {
+        // Assuming the following abort() call will be successful. Set here early because abort()
+        // will trigger end() on the file stream, which will call the fileStream.on('finish')
+        // handler which needs to know if the download was cancelled.
+        wasCancelled = true;
+        downloadStream._source.stream.abort();
+
+        // Tried wrapping this in a .on('aborted') event for the stream, but the event
+        // doesn't seem to be triggered with .abort() is called.
+        progressStream.emit('cancelled');
+    };
 
     // Pipe the download stream (an HTTP response) to the progress stream and then to a file
     downloadStream.pipe(progressStream).pipe(fileStream);

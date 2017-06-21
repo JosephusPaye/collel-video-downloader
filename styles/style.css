@@ -4,11 +4,15 @@
 }
 
 html,
-body {
+body,
+#app {
     margin: 0;
     padding 0;
     width: 100vw;
     height: 100vh;
+    overflow: hidden;
+    cursor: default;
+    user-select: none;
 }
 
 strong {
@@ -82,13 +86,18 @@ strong {
     padding-right: 8px;
 }
 
+.content-wrapper {
+    flex-grow: 1;
+    overflow: auto;
+    height: calc(100vh - 83px);
+}
+
 .status-bar {
     background-color: #EEE;
     border-top: 1px solid #DDD;
     bottom: 0;
     display: flex;
     font-size: 13px;
-    margin-top: auto;
     padding: 6px 10px;
     position: absolute;
     width: 100%;
@@ -113,16 +122,33 @@ strong {
     font-size: 14px;
 }
 
+.download.is-cancelled {
+    opacity: 0.7;
+}
+
+.download.is-cancelled .download-index,
+.download.is-cancelled .download-filename,
+.download.is-cancelled .download-filesize {
+    text-decoration: line-through;
+}
+
 .download-index {
     width: 32px;
+    min-width: 32px;
+    color: rgba(0, 0, 0, 0.75);
 }
 
 .download-filename {
+    max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     width: 32%;
 }
 
 .download-filesize {
     width: 106px;
+    min-width: 96px;
 }
 
 .download-progress {
@@ -131,10 +157,12 @@ strong {
 
 .download-speed {
     width: 106px;
+    min-width: 96px;
 }
 
 .download-eta {
     width: 106px;
+    min-width: 96px;
 }
 
 .download-placeholder {
@@ -143,7 +171,7 @@ strong {
 
 .message-overlay {
     align-items: center;
-    background-color: rgba(255,255,255,0.8);
+    background-color: rgba(255, 255, 255, 0.8);
     bottom: 0;
     display: flex;
     flex-direction: column;
@@ -163,10 +191,10 @@ strong {
 }
 
 .message-overlay-spinner-path {
-    stroke-dasharray: 89,200;
+    stroke-dasharray: 89, 200;
     stroke-dashoffset: -35px;
     stroke-linecap: round;
-    stroke: rgba(0,0,0,0.54);
+    stroke: rgba(0, 0, 0, 0.54);
 }
 
 @keyframes message-overlay-spinner-rotate {
@@ -176,5 +204,5 @@ strong {
 }
 
 .message-overlay-error {
-    fill: rgba(0,0,0,0.54);
+    fill: rgba(0, 0, 0, 0.54);
 }

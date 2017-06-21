@@ -1,5 +1,5 @@
 const Store = require('electron-store');
-const { shell } = require('electron');
+const { ipcRenderer } = require('electron');
 const { version } = require('./package.json');
 
 const store = new Store();
@@ -10,7 +10,7 @@ const store = new Store();
  * @param  {String} link
  */
 function openLink(link) {
-    shell.openExternal(link);
+    ipcRenderer.send('open-external', link);
 }
 
 // Set the app version
