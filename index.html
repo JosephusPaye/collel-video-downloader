@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <title>Video Downloader</title>
     <link rel="stylesheet" href="node_modules/keen-ui/dist/keen-ui.min.css">
-    <link rel="stylesheet" href="table.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="styles/table.css">
+    <link rel="stylesheet" href="styles/style.css">
     <style>
         [v-cloak] {
             display: none;
@@ -13,64 +13,91 @@
     </style>
 </head>
 <body>
-    <div id="app" v-cloak>
-        <div class="input-wrapper">
-            <input type="text" v-model="input" class="input" placeholder="Enter video link" autofocus>
-            <ui-button class="download-button" color="primary" @click="download()" :loading="fetchingInfo">Download</ui-button>
-            <ui-button class="download-options-button" color="primary" has-dropdown ref="downloadOptionsButton" :disabled="fetchingInfo">
-                <svg width="24px" height="24px" viewBox="0 0 24 24">
-                    <path fill="#fff" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
-                </svg>
-                <ui-menu
-                    contain-focus slot="dropdown" :options="downloadOptionsMenu" @close="$refs.downloadOptionsButton.closeDropdown()"
-                    @select="onDownloadOptionSelect"
-                ></ui-menu>
-            </ui-button>
+    <div id="app">
+        <div class="cloak-wrapper" v-cloak>
+            <div class="input-wrapper">
+                <ui-button class="settings-button" has-dropdown ref="settingsButton" title="Settings">
+                    <svg fill="#757575" height="24" viewBox="0 0 24 24" width="24">
+                        <path d="M0 0h24v24H0z" fill="none"></path>
+                        <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"></path>
+                    </svg>
+                    <ui-menu
+                        contain-focus slot="dropdown" :options="settingsMenu" @close="$refs.settingsButton.closeDropdown()"
+                        @select="onSettingOptionSelect"
+                    ></ui-menu>
+                </ui-button>
+
+                <input type="text" v-model="input" class="input" placeholder="Enter video link" autofocus>
+                <ui-button class="download-button" color="primary" @click="download()" :loading="fetchingInfo">Download</ui-button>
+
+                <ui-button class="download-options-button" color="primary" has-dropdown ref="downloadOptionsButton" :disabled="fetchingInfo">
+                    <svg width="24px" height="24px" viewBox="0 0 24 24">
+                        <path fill="#fff" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path>
+                    </svg>
+                    <ui-menu
+                        contain-focus slot="dropdown" :options="downloadOptionsMenu" @close="$refs.downloadOptionsButton.closeDropdown()"
+                        @select="onDownloadOptionSelect"
+                    ></ui-menu>
+                </ui-button>
+            </div>
+
+            <table class="table table-striped table-responsive downloads">
+                <thead>
+                    <tr>
+                        <th class="download-index">#</th>
+                        <th class="download-filename">Name</th>
+                        <th class="download-filesize">Size</th>
+                        <th class="download-progress">Progress</th>
+                        <th class="download-speed">Speed</th>
+                        <th class="download-eta">ETA</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr v-for="(download, index) in downloads" :key="download.url">
+                        <td class="download-index">{{ index + 1 }}</td>
+                        <td class="download-filename">{{ download.filename }}</td>
+                        <td class="download-filesize">{{ download.size | prettyBytes }}</td>
+                        <td class="download-progress">
+                            <ui-progress-linear type="determinate" :progress="download.progress"></ui-progress-linear>
+                            <span class="download-progress-value">
+                                <span>{{ download.status }}</span> <span>{{ download.progress | prettyPercentage }}</span>
+                            </span>
+                        </td>
+                        <td class="download-speed">{{ download.speed | prettySpeed }}</td>
+                        <td class="download-eta">{{ download.eta | prettyDuration }}</td>
+                    </tr>
+
+                    <tr v-if="downloads.length === 0"><td colspan="6" class="download-placeholder">No downloads. Enter a video link in the box above and click <strong>Download</strong> to begin.</td></tr>
+                </tbody>
+            </table>
+
+            <div class="status-bar">
+                <div class="status-bar-left">
+                    <span>
+                        Download folder: <a @click="openDownloadDirectory" title="Click to open">{{ downloadDirectory }}</a>
+                        [<a @click="changeDownloadDirectory" title="Click to change download folder">Change</a>]
+                    </span>
+                </div>
+
+                <div class="status-bar-right">
+                    <!-- <a @click="updateYoutubeDl">Update downloader</a> -->
+                    <a @click="clearCompletedDownloads">Clear completed</a>
+                </div>
+            </div>
         </div>
 
-        <table class="table table-striped table-responsive downloads">
-            <thead>
-                <tr>
-                    <th class="download-index">#</th>
-                    <th class="download-filename">Name</th>
-                    <th class="download-filesize">Size</th>
-                    <th class="download-progress">Progress</th>
-                    <th class="download-speed">Speed</th>
-                    <th class="download-eta">ETA</th>
-                </tr>
-            </thead>
+        <div class="cloak-wrapper message-overlay" v-cloak v-show="messageOverlay.shown">
+            <svg class="message-overlay-spinner" role="progressbar" viewBox="25 25 50 50" v-show="messageOverlay.type === 'progress'">
+                <circle class="message-overlay-spinner-path" cx="50" cy="50" fill="none" r="20" stroke-miterlimit="10" stroke-width="4"></circle>
+            </svg>
 
-            <tbody>
-                <tr v-for="(download, index) in downloads" :key="download.url">
-                    <td class="download-index">{{ index + 1 }}</td>
-                    <td class="download-filename">{{ download.filename }}</td>
-                    <td class="download-filesize">{{ download.size | prettyBytes }}</td>
-                    <td class="download-progress">
-                        <ui-progress-linear type="determinate" :progress="download.progress"></ui-progress-linear>
-                        <span class="download-progress-value">
-                            <span>{{ download.status }}</span> <span>{{ download.progress | prettyPercentage }}</span>
-                        </span>
-                    </td>
-                    <td class="download-speed">{{ download.speed | prettySpeed }}</td>
-                    <td class="download-eta">{{ download.eta | prettyDuration }}</td>
-                </tr>
+            <svg class="message-overlay-error" height="24" viewBox="0 0 24 24" width="24" v-show="messageOverlay.type === 'error'">
+                <path d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path>
+            </svg>
 
-                <tr v-if="downloads.length === 0"><td colspan="6" class="download-placeholder">No downloads. Enter a link in the box above and click <strong>Download</strong> to begin.</td></tr>
-            </tbody>
-        </table>
-
-        <div class="status-bar">
-            <div class="status-bar-left">
-                <span>
-                    Download folder: <a @click="openDownloadDirectory" title="Click to open">{{ downloadDirectory }}</a>
-                    [<a @click="changeDownloadDirectory" title="Click to change download folder">Change</a>]
-                </span>
-            </div>
-
-            <div class="status-bar-right">
-                <!-- <a @click="updateYoutubeDl">Update downloader</a> -->
-                <a @click="clearCompletedDownloads">Clear completed</a>
-            </div>
+            <div class="message-overlay-text">{{ messageOverlay.message }}</div>
         </div>
     </div>
 

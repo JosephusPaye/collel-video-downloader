@@ -1,6 +1,6 @@
 {
   "name": "downloader",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "main.js",
   "author": "Josephus Paye II",
   "private": true,
@@ -16,6 +16,7 @@
     "progress-stream": "^2.0.0",
     "shortid": "^2.2.8",
     "vue": "^2.1.7",
+    "yaku": "^0.18.0",
     "youtube-dl": "^1.11.1"
   },
   "devDependencies": {

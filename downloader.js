@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
-const shortId = require('shortid');
 const progress = require('progress-stream');
+const Promise = require('yaku/lib/yaku.core');
+const shortId = require('shortid');
 const youtubeDl = require('youtube-dl');
 
 const defaultOptions = {

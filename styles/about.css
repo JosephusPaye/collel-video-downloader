@@ -1,0 +1,38 @@
+* {
+    box-sizing: border-box;
+    font-family: Segoe UI, sans-serif;
+}
+
+html,
+body {
+    margin: 0;
+    padding 0;
+    font-size: 14px;
+}
+
+a {
+    text-decoration: none;
+    color: #0c7cd5;
+    cursor: pointer;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.about {
+	text-align: center;
+}
+
+.about-title {
+	font-size: 18px;
+	font-weight: 500;
+}
+
+code {
+	color: #c7254e;
+    background-color: #f9f2f4;
+    border-radius: 0.25rem;
+    font-family: Menlo,Monaco,Consolas,Courier New,monospace;
+    padding: 4px 8px;
+}

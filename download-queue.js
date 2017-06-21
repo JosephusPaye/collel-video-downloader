@@ -1,4 +1,4 @@
-const youtubeDl = require('./download');
+const youtubeDl = require('./downloader');
 
 module.exports = class DownloadQueue {
     constructor(directory) {
@@ -24,7 +24,7 @@ module.exports = class DownloadQueue {
         const self = this;
         const item = this.items.shift();
 
-        item.status = 'Requesting';
+        item.status = 'Requesting...';
         this.downloadInProgress = true;
 
         youtubeDl.download(item.url, { filename: item.filename + '.part', directory: this.downloadDirectory, args: item.args || [] })

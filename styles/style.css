@@ -54,9 +54,20 @@ strong {
     flex-grow: 1;
 }
 
+.settings-button,
 .download-button,
 .download-options-button {
     cursor: default;
+    text-transform: initial;
+}
+
+.settings-button {
+    border-radius: 2px 0 0 2px!important;
+    min-width: 32px;
+    padding-left: 8px;
+    padding-right: 8px;
+    border: 1px solid #AAA;
+    border-right: 0;
 }
 
 .download-button {
@@ -65,7 +76,6 @@ strong {
 
 .download-options-button {
     border-left: 1px solid #0c7cd5;
-    border-radius: 0 2px 2px 0!important;
     border-radius: 0 2px 2px 0!important;
     min-width: 32px;
     padding-left: 8px;
@@ -129,4 +139,42 @@ strong {
 
 .download-placeholder {
     text-align: center;
+}
+
+.message-overlay {
+    align-items: center;
+    background-color: rgba(255,255,255,0.8);
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 1;
+}
+
+.message-overlay-spinner {
+    animation: message-overlay-spinner-rotate 0.6s linear infinite;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 16px;
+}
+
+.message-overlay-spinner-path {
+    stroke-dasharray: 89,200;
+    stroke-dashoffset: -35px;
+    stroke-linecap: round;
+    stroke: rgba(0,0,0,0.54);
+}
+
+@keyframes message-overlay-spinner-rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.message-overlay-error {
+    fill: rgba(0,0,0,0.54);
 }
