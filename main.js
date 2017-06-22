@@ -1,10 +1,10 @@
+const createMenu = require('./context-menus');
 const path = require('path');
 const url = require('url');
-const createMenu = require('./context-menus');
 const { app, BrowserWindow, dialog, ipcMain, shell } = require('electron');
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
+// Keep a global reference of the window object, if not, the window will
+// be closed automatically when the object is garbage collected.
 let mainWindow;
 
 /**
@@ -16,8 +16,9 @@ function createWindow() {
         height: 600,
         minHeight: 300,
         minWidth: 640,
-        title: 'Video Downloader',
-        width: 920
+        title: 'Collel Video Downloader',
+        width: 920,
+        icon: path.join(__dirname, 'icons', (process.platform === 'win32' ? 'app.ico' : 'app.png'))
     });
 
     mainWindow.loadURL(url.format({
@@ -56,7 +57,7 @@ app.on('activate', function() {
 // Handle requests for a context menu from the renderer
 ipcMain.on('show-context-menu', (event, options) => {
     const win = BrowserWindow.fromWebContents(event.sender);
-    const menu = createMenu(options.menuId, (menuItem) => {
+    const menu = createMenu(options.menuId, options.hasSelection, (menuItem) => {
         event.sender.send('context-menu-item-selected', {
             selectedOptionId: menuItem.id,
             downloadId: options.downloadId
@@ -68,7 +69,9 @@ ipcMain.on('show-context-menu', (event, options) => {
     }
 });
 
-// Show the warning message for invalid paths passed to shell.openItem()/shell.showItemInFolder()
+/**
+ * Show the warning message for invalid paths passed to shell.openItem()/shell.showItemInFolder()
+ */
 function showMovedItemWarning() {
     dialog.showMessageBox({
         type: 'warning',

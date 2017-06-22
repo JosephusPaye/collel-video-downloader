@@ -6,6 +6,12 @@ const Store = require('electron-store');
 
 const store = new Store();
 
+/**
+ * Download or update the youtube-dl binary
+ *
+ * @param  {String} appDataDirectory The path to the app's data directory
+ * @return {Promise}
+ */
 function initialize(appDataDirectory) {
     return new Promise((resolve, reject) => {
         const binPath = path.join(appDataDirectory, 'bin');
@@ -29,13 +35,19 @@ function initialize(appDataDirectory) {
     });
 }
 
+/**
+ * Get the current version of the youtube-dl binary
+ *
+ * @param  {String} appDataDirectory The path to the app's data directory
+ * @return {Promise}
+ */
 function getVersion(appDataDirectory) {
     return new Promise((resolve, reject) => {
         if (store.has('youtubeDl')) {
             return resolve(store.get('youtubeDl.version'));
         }
 
-        reject('youtube-dl not initialized yet.');
+        reject('youtube-dl not downloaded yet.');
     });
 }
 

@@ -1,6 +1,15 @@
 const { Menu } = require('electron');
 
-function createMenu(menuId, onClick) {
+/**
+ * Create a menu corresponding to the given menu id
+ *
+ * @param  {String}  menuId        The type of menu to create
+ * @param  {Boolean} hasSelection  Whether or not text was selected when the menu was invoked
+ * @param  {Function}  onClick     A function to call when an item is selected in the menu.
+ *                                 Is called with the selected menu item.
+ * @return {Electron.Menu}
+ */
+function createMenu(menuId, hasSelection = false, onClick) {
     const open = {
         id: 'open',
         label: 'Open',
@@ -35,7 +44,24 @@ function createMenu(menuId, onClick) {
         type: 'separator'
     };
 
-    switch(menuId) {
+    const cut = {
+        label: 'Cut',
+        role: 'cut',
+        enabled: hasSelection
+    };
+
+    const copy = {
+        label: 'Copy',
+        role: 'copy',
+        enabled: hasSelection
+    };
+
+    const paste = {
+        label: 'Paste',
+        role: 'paste'
+    };
+
+    switch (menuId) {
         case 'downloadConnecting':
             return Menu.buildFromTemplate([openInBrowser]);
         case 'downloadQueued':
@@ -46,6 +72,8 @@ function createMenu(menuId, onClick) {
             return Menu.buildFromTemplate([showInFolder, cancel, separator, openInBrowser]);
         case 'downloadComplete':
             return Menu.buildFromTemplate([open, showInFolder, removeFromList, separator, openInBrowser]);
+        case 'input':
+            return Menu.buildFromTemplate([cut, copy, paste]);
         default:
             return null;
     };

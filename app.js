@@ -1,6 +1,7 @@
 const aboutWindow = require('./about-window');
 const downloadAction = require('./download-actions');
 const downloader = require('./downloader');
+const downloadErrors = require('./download-errors');
 const DownloadQueue = require('./download-queue');
 const humanizer = require('./humanizer');
 const menu = require('./menus');
@@ -31,29 +32,32 @@ const vm = new Vue({
                 shown: false,
                 message: ''
             },
+            // A map of download status to the corresponding context menu
             contextMenus: {
                 'Connecting...': 'downloadConnecting',
                 'Queued': 'downloadQueued',
                 'Downloading': 'downloadInProgress',
                 'Complete': 'downloadComplete',
-                'Error': 'downloadError',
+                'Error': 'downloadErrors',
                 'Cancelled': 'downloadCancelled'
             }
         };
     },
 
     created() {
+        // Initialize youtubeDl if it isn't already initialized
         if (!store.has('youtubeDl')) {
             this.showProgressOverlay('Setting up for first use. Please wait.', { type: 'progress' });
 
             youtubeDl.initialize(appDataDirectory)
                 .then(this.hideMessageOverlay)
                 .catch(err => {
-                    console.log('Error initializing youtube-dl', err);
-                    this.showErrorOverlay('An error occurred while setting up. Please check your internet connection and restart Video Downloader.');
+                    console.error('Error initializing youtube-dl', err);
+                    this.showErrorOverlay('An error occurred while setting up. Please check your internet connection and restart Collel.');
                 });
         }
 
+        // Listen for menu item selection from the main process
         ipcRenderer.on('context-menu-item-selected', this.onContextMenuItemSelect);
     },
 
@@ -77,7 +81,7 @@ const vm = new Vue({
         },
 
         downloadAudio() {
-            this.download(['-f=bestaudio/mp3/m4a/140']);
+            this.download(['-f=mp3/bestaudio/m4a']);
         },
 
         getVideoUrl() {
@@ -122,15 +126,18 @@ const vm = new Vue({
         showUrlSuccess(info) {
             this.showDialog(
                 'Video URL copied',
-                'Download URL for video "' + info.title + '" has been copied to the clipboard.', { type: 'info' }
+                'Download URL for video "' + info.title + '" has been copied to the clipboard.',
+                { type: 'info' }
             );
         },
 
         showUrlError(err) {
-            console.error('Error getting video info', err);
+            console.error('Error fetching video info', err);
+            const message = downloadErrors.identify(err);
+
             this.showDialog(
-                'Link error',
-                'No video found for the link entered. Check the link for errors.\nIf the link is correct, update the downloader from the Settings menu and try again.', { type: 'warning' }
+                message.title,
+                message.message
             );
         },
 
@@ -148,6 +155,13 @@ const vm = new Vue({
             } else if (option.id === 'get-url') {
                 this.getVideoUrl();
             }
+        },
+
+        onInputContextMenu(e, data) {
+            ipcRenderer.send('show-context-menu', {
+                menuId: 'input',
+                hasSelection: window.getSelection().toString().length > 0
+            });
         },
 
         onContextMenu(item) {
@@ -169,17 +183,20 @@ const vm = new Vue({
                     this.hideMessageOverlay();
 
                     const title = result.updated ? 'Downloader updated' : 'Up to date';
-                    const message = result.updated ? 'Downloader was updated to version ' + result.version + '.' : 'Downloader is already up to date. Current version: ' + result.version + '.'
+                    const message = result.updated ?
+                        'Downloader was updated to version ' + result.version + '.' :
+                        'Downloader is already up to date. Current version: ' + result.version + '.'
 
                     this.showDialog(title, message);
                 })
                 .catch(err => {
+                    console.error('Error updating youtube-dl', err);
                     this.hideMessageOverlay();
-                    console.log('Error updating youtube-dl', err);
 
                     this.showDialog(
                         'Update error',
-                        'An error occurred while updating the downloader. Please check your internet connection and try again.', { type: 'warning' }
+                        'An error occurred while updating the downloader. Please check your internet connection and try again.',
+                        { type: 'warning' }
                     );
                 });
         },
@@ -210,8 +227,8 @@ const vm = new Vue({
         },
 
         clearCompletedDownloads() {
+            // Remove downloads that are complete, cancelled or have errors
             this.downloads = this.downloads.filter(d => {
-                // Remove downloads that are complete, cancelled or have errors
                 return d.status !== 'Complete' && d.status !== 'Error' && d.status !== 'Cancelled';
             });
         },

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Video Downloader</title>
+    <title>Collel Video Downloader</title>
     <link rel="stylesheet" href="node_modules/keen-ui/dist/keen-ui.min.css">
     <link rel="stylesheet" href="styles/table.css">
     <link rel="stylesheet" href="styles/style.css">
@@ -25,7 +25,11 @@
                     ></ui-menu>
                 </ui-button>
 
-                <input type="text" v-model="input" class="input" placeholder="Enter video link and click Download">
+                <input
+                    type="text" v-model="input" class="input" placeholder="Enter video link and click Download"
+                    @contextmenu="onInputContextMenu" @keydown.enter="download()"
+                >
+
                 <ui-button class="download-button" color="primary" @click="download()" :loading="fetchingInfo">Download</ui-button>
 
                 <ui-button class="download-options-button" color="primary" has-dropdown ref="downloadOptionsButton" :disabled="fetchingInfo">
@@ -77,7 +81,7 @@
 
                         <tr v-if="downloads.length === 0">
                             <td colspan="6" class="download-placeholder">
-                                No downloads. Enter a video link in the box above and click <strong>Download</strong> to begin.
+                                No downloads. Enter a link in the box above and click <strong>Download</strong> to begin.
                             </td>
                         </tr>
                     </tbody>
@@ -112,8 +116,8 @@
         </div>
     </div>
 
-    <script src="node_modules/vue/dist/vue.js"></script>
-    <script src="node_modules/keen-ui/dist/keen-ui.js"></script>
+    <script src="node_modules/vue/dist/vue.min.js"></script>
+    <script src="node_modules/keen-ui/dist/keen-ui.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

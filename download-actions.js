@@ -1,5 +1,13 @@
 const { ipcRenderer } = require('electron');
 
+/**
+ * Find a download by its uid from the list of downloads.
+ * Returns null if not found.
+ *
+ * @param  {String} uid
+ * @param  {Array} downloads
+ * @return {Object|null}
+ */
 function findDownload(uid, downloads) {
 	for (let i = 0; i < downloads.length; i++) {
 		if (uid == downloads[i].uid) {
@@ -13,6 +21,12 @@ function findDownload(uid, downloads) {
 	return null;
 }
 
+/**
+ * Handle the user's request to cancel a download
+ *
+ * @param  {Object} download
+ * @param  {DownloadQueue} downloadQueue
+ */
 function handleCancel(download, downloadQueue) {
 	if (download.status !== 'Downloading') {
 		return;
@@ -21,6 +35,13 @@ function handleCancel(download, downloadQueue) {
 	downloadQueue.cancelDownload(download);
 }
 
+/**
+ * Handle a user's action on a download
+ *
+ * @param  {Object} data          An object with details about the download to act on
+ * @param  {Array} downloads      The list of all downloads
+ * @param  {Array} downloadQueue  The download queue
+ */
 function handle(data, downloads, downloadQueue) {
 	const result = findDownload(data.downloadId, downloads);
 

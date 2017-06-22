@@ -3,13 +3,16 @@ const url = require('url');
 const { remote } = require('electron');
 
 const windowOptions = {
-    title: 'About Video Downloader',
+    title: 'About Collel Video Downloader',
     width: 340,
     height: 175,
     resizable: false,
     autoHideMenuBar: true
 };
 
+/**
+ * Create and show the About window
+ */
 function show() {
     (new remote.BrowserWindow(windowOptions))
     .loadURL(url.format({

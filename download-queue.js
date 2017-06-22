@@ -1,13 +1,34 @@
 const downloader = require('./downloader');
 
-module.exports = class DownloadQueue {
+/**
+ * The DownloadQueue class, handles downloading and item status updates (progress, status, etc).
+ */
+class DownloadQueue {
+    /**
+     * Create an instance of DownloadQueue with the given directory
+     *
+     * @param  {String} directory
+     * @return {DownloadQueue}
+     */
     constructor(directory) {
-        this.items = [];
-        this.downloads = [];
-        this.downloadInProgress = false;
+        // The download directory
         this.downloadDirectory = directory;
+
+        // Whether or not a download is currently in progress for this queue
+        this.downloadInProgress = false;
+
+        // The list of downloads currently in progress
+        this.downloads = [];
+
+        // The list of items waiting to download
+        this.items = [];
     }
 
+    /**
+     * Add a new item unto the queue, and start download if the queue is empty
+     *
+     * @param  {Object} item
+     */
     push(item) {
         this.items.push(item);
 
@@ -16,6 +37,9 @@ module.exports = class DownloadQueue {
         }
     }
 
+    /**
+     * Process the next item on the download queue
+     */
     next() {
         if (this.items.length === 0) {
             this.downloadInProgress = false;
@@ -73,13 +97,24 @@ module.exports = class DownloadQueue {
             });
 
         download.uid = item.uid;
+
         this.downloads.push(download);
     }
 
+    /**
+     * Change the download directory
+     *
+     * @param {String} directory
+     */
     setDirectory(directory) {
         this.downloadDirectory = directory;
     }
 
+    /**
+     * Cancel the download corresponding to the given item
+     *
+     * @param  {Object} item The download item
+     */
     cancelDownload(item) {
         for (let i = 0; i < this.downloads.length; i++) {
             if (this.downloads[i].uid === item.uid) {
@@ -89,3 +124,5 @@ module.exports = class DownloadQueue {
         }
     }
 }
+
+module.exports = DownloadQueue;

@@ -5,6 +5,7 @@ const Promise = require('yaku/lib/yaku.core');
 const shortId = require('shortid');
 const youtubeDl = require('youtube-dl');
 
+// Default download options
 const defaultOptions = {
     directory: path.join(__dirname, 'downloads'),
     args: []
@@ -13,11 +14,11 @@ const defaultOptions = {
 /**
  * Download the video at the given URL
  *
- * @param  {String} url                 The URL of the video
- * @param  {String} options.directory   The path to set as youtube-dl's working directory
- * @param  {String} options.filename    The output filename
- * @param  {Array}  options.args        Args to pass to youtube-dl. Format: ['--format=22', '...']
- * @return {Stream}                     The download progress stream
+ * @param  {String} url                The URL of the video
+ * @param  {String} options.directory  The path to set as youtube-dl's working directory
+ * @param  {String} options.filename   The output filename
+ * @param  {Array}  options.args       Args to pass to youtube-dl. Format: ['--format=22', '...']
+ * @return {Stream}                    The download progress stream
  */
 function download(url, options = {}) {
     options = Object.assign({}, defaultOptions, options);
@@ -117,8 +118,8 @@ function download(url, options = {}) {
 /**
  * Get the info of the video at the given url
  *
- * @param  {String} url       The URL of the video
- * @param  {Array}  args      Args to pass to youtube-dl. Format: ['--format=22', '...']
+ * @param  {String} url   The URL of the video
+ * @param  {Array}  args  Args to pass to youtube-dl. Format: ['--format=22', '...']
  * @return {Promise}
  */
 function getInfo(url, args = []) {
@@ -155,6 +156,7 @@ function getInfo(url, args = []) {
     });
 }
 
+// Example usage:
 // download('https://www.youtube.com/watch?v=dxWvtMOGAhw')
 //     .on('info', info => { console.log('Downloading:', info._filename); })
 //     .on('progress', p => { console.log(p.percentage); })
