@@ -81,7 +81,7 @@ const vm = new Vue({
         },
 
         downloadAudio() {
-            this.download(['-f=mp3/bestaudio/m4a']);
+            this.download(['-f=mp3/m4a/bestaudio']);
         },
 
         getVideoUrl() {
