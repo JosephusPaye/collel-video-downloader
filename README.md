@@ -1,8 +1,8 @@
 <p align="center">
 	<img src="https://github.com/JosephusPaye/collel-video-downloader/blob/master/icons/app.png?raw=true" width="72" height="72">
-	<h1>Collel Video Downloader</h1>
 </p>
 
+<h1 align="center">Collel Video Downloader</h1>
 
 Online video downloader, useful for quickly downloading videos from YouTube, Vimeo and many other sites. Powered by [youtube-dl](https://rg3.github.io/youtube-dl/).
 
