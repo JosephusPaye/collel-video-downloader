@@ -1,25 +1,48 @@
 {
   "name": "collel-video-downloader",
+  "productName": "Collel Video Downloader",
+  "description": "Online video downloader, useful for quickly downloading videos from sites like YouTube, Vimeo and more. Powered by youtube-dl.",
   "version": "0.1.0",
   "main": "main.js",
   "author": "Josephus Paye II",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JosephusPaye/collel-video-downloader.git"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder",
+    "pack": "electron-builder --dir"
+  },
+  "build": {
+    "appId": "josephuspaye.collel-video-downloader",
+    "copyright": "Copyright © 2017 Josephus Paye II",
+    "mac": {
+      "category": "public.app-category.utilities"
+    },
+    "win": {
+      "target": "squirrel"
+    },
+    "squirrelWindows": {
+      "iconUrl": "https://raw.githubusercontent.com/JosephusPaye/collel-video-downloader/master/icons/app.ico"
+    }
+  },
+  "updater": {
+    "url": "https://raw.githubusercontent.com/JosephusPaye/collel-video-downloader/master/updates.json"
   },
   "dependencies": {
     "electron-store": "^1.1.0",
     "humanize-duration": "^3.10.0",
-    "keen-ui": "^1.0.0",
     "pretty-bytes": "^4.0.2",
     "progress-stream": "^2.0.0",
     "shortid": "^2.2.8",
-    "vue": "^2.1.7",
     "yaku": "^0.18.0",
     "youtube-dl": "^1.11.1"
   },
   "devDependencies": {
-    "electron": "^1.6.11"
+    "electron": "^1.6.11",
+    "electron-builder": "^19.7.1",
+    "electron-builder-squirrel-windows": "^19.7.2"
   }
 }
