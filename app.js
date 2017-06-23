@@ -1,6 +1,8 @@
 const aboutWindow = require('./about-window');
 const downloadAction = require('./download-actions');
+const downloader = require('./downloader');
 const downloadErrors = require('./download-errors');
+const DownloadQueue = require('./download-queue');
 const humanizer = require('./humanizer');
 const menu = require('./menus');
 const shortId = require('shortid');
@@ -11,9 +13,8 @@ const { remote, clipboard, ipcRenderer } = require('electron');
 const store = new Store();
 const appDataDirectory = remote.app.getPath('userData');
 
-let downloader;
-let downloadQueue;
 const downloadDirectory = store.get('downloadDirectory', remote.app.getPath('downloads'));
+let downloadQueue = new DownloadQueue(downloadDirectory);
 
 const vm = new Vue({
     el: '#app',
@@ -44,19 +45,12 @@ const vm = new Vue({
     },
 
     created() {
-        // Lazily initialize './downloader' and './download-queue'. This is done to ensure that
-        // the youtube-dl binary has been downloaded first, since those files import the
-        // 'youtube-dl' package, which throws an error if the binary isn't available.
-        if (store.has('youtubeDl')) {
-            this.initializeDownloader();
-        } else {
+        // Initialize youtube-dl (download binary) if running for the first time
+        if (!store.has('youtubeDl')) {
             this.showProgressOverlay('Setting up for first use. Please wait.', { type: 'progress' });
 
             youtubeDl.initialize(appDataDirectory)
-                .then(() => {
-                    this.hideMessageOverlay();
-                    this.initializeDownloader();
-                })
+                .then(this.hideMessageOverlay)
                 .catch(err => {
                     console.error('Error initializing youtube-dl', err);
                     this.showErrorOverlay('An error occurred while setting up. Please check your internet connection and restart Collel.');
@@ -75,7 +69,7 @@ const vm = new Vue({
 
             this.fetchingInfo = true;
 
-            downloader.getInfo(this.input, args)
+            downloader.getInfo(this.input, { args: args })
                 .then(info => {
                     this.input = '';
                     [].concat(info).forEach(item => { this.addDownload(item, args); });
@@ -181,13 +175,6 @@ const vm = new Vue({
             downloadAction.handle(data, this.downloads, downloadQueue);
         },
 
-        initializeDownloader() {
-            const DownloadQueue = require('./download-queue');
-
-            downloader = require('./downloader');
-            downloadQueue = new DownloadQueue(downloadDirectory);
-        },
-
         updateYoutubeDl() {
             this.showProgressOverlay('Updating downloader. Please wait.');
 
@@ -242,7 +229,7 @@ const vm = new Vue({
         clearCompletedDownloads() {
             // Remove downloads that are complete, cancelled or have errors
             this.downloads = this.downloads.filter(d => {
-                return d.status !== 'Complete' && d.status !== 'Error' && d.status !== 'Cancelled';
+                return !(d.status === 'Complete' || d.status === 'Error' || d.status === 'Cancelled');
             });
         },
 
