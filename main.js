@@ -1,6 +1,6 @@
 const createMenu = require('./context-menus');
 const path = require('path');
-const updater = require('electron-simple-updater')
+const updater = require('electron-simple-updater');
 const url = require('url');
 const { app, BrowserWindow, dialog, ipcMain, shell } = require('electron');
 
@@ -51,7 +51,8 @@ function createWindow() {
         minWidth: 640,
         title: 'Collel Video Downloader',
         width: 920,
-        icon: path.join(__dirname, 'icons', (process.platform === 'win32' ? 'app.ico' : 'app.png'))
+        icon: path.join(__dirname, 'icons', (process.platform === 'win32' ? 'app.ico' : 'app.png')),
+        show: false
     });
 
     mainWindow.loadURL(url.format({
@@ -59,6 +60,11 @@ function createWindow() {
         protocol: 'file:',
         slashes: true
     }));
+
+    // Show the window only after the DOM is rendered initially
+    mainWindow.once('ready-to-show', () => {
+        mainWindow.show();
+    });
 
     // Dereference the window object on close to allow for GC
     mainWindow.on('closed', function() {
