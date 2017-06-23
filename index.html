@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Collel Video Downloader</title>
-    <link rel="stylesheet" href="node_modules/keen-ui/dist/keen-ui.min.css">
+    <link rel="stylesheet" href="styles/keen-ui.min.css">
     <link rel="stylesheet" href="styles/table.css">
     <link rel="stylesheet" href="styles/style.css">
     <style>
@@ -26,7 +26,7 @@
                 </ui-button>
 
                 <input
-                    type="text" v-model="input" class="input" placeholder="Enter video link and click Download"
+                    type="text" v-model="input" class="input" placeholder="Enter a link and click Download"
                     @contextmenu="onInputContextMenu" @keydown.enter="download()"
                 >
 
@@ -116,8 +116,8 @@
         </div>
     </div>
 
-    <script src="node_modules/vue/dist/vue.min.js"></script>
-    <script src="node_modules/keen-ui/dist/keen-ui.min.js"></script>
+    <script src="js/vue.min.js"></script>
+    <script src="js/keen-ui.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
