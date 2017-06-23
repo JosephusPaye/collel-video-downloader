@@ -12,8 +12,8 @@
   },
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder",
-    "pack": "electron-builder --dir",
+    "build": "node ./build/reset-youtube-dl.js && electron-builder",
+    "pack": "node ./build/reset-youtube-dl.js && electron-builder --dir",
     "publish": "publish"
   },
   "updater": {
