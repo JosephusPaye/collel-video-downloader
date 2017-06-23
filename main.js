@@ -7,10 +7,31 @@ const { app, BrowserWindow, dialog, ipcMain, shell } = require('electron');
 // be closed automatically when the object is garbage collected.
 let mainWindow;
 
+// When the user tries to run a second instance of the app, we should focus the main window, ...
+const shouldQuitForPrimaryInstance = app.makeSingleInstance((commandLine, workingDirectory) => {
+    if (mainWindow) {
+        if (mainWindow.isMinimized()) {
+            mainWindow.restore();
+        }
+
+        mainWindow.focus();
+    }
+});
+
+// ... and quit the duplicate instance for the main one.
+if (shouldQuitForPrimaryInstance) {
+    app.quit();
+}
+
 /**
  * Create the main window
  */
 function createWindow() {
+    // Don't create the window if this is a duplicate instance
+    if (shouldQuitForPrimaryInstance) {
+        return;
+    }
+
     mainWindow = new BrowserWindow({
         autoHideMenuBar: true,
         height: 600,
