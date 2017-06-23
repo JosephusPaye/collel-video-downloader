@@ -139,3 +139,8 @@ ipcMain.on('show-item-in-folder', (event, path) => {
 ipcMain.on('open-external', (event, path) => {
     shell.openExternal(path);
 });
+
+// Show the devtools for the renderer sending the message
+ipcMain.on('show-devtools', (event) => {
+    event.sender.toggleDevTools();
+});

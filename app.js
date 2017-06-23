@@ -267,3 +267,10 @@ const vm = new Vue({
         prettyPercentage: humanizer.percentage
     }
 });
+
+// Show the devtools on F12
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'F12') {
+        ipcRenderer.send('show-devtools');
+    }
+}, false);
