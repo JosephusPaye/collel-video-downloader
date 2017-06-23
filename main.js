@@ -1,7 +1,19 @@
 const createMenu = require('./context-menus');
 const path = require('path');
+const updater = require('electron-simple-updater')
 const url = require('url');
 const { app, BrowserWindow, dialog, ipcMain, shell } = require('electron');
+
+// Initialize the updater, will check for updates, download and install automatically.
+// New version will be used on next restart of app after update.
+updater.init();
+
+// Delete the user data folder on uninstall
+updater.on('squirrel-win-installer', (event) => {
+    if (event.squirrelAction === 'squirrel-uninstall') {
+        require('rimraf').sync(app.getPath('userData'));
+    }
+});
 
 // Keep a global reference of the window object, if not, the window will
 // be closed automatically when the object is garbage collected.

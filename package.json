@@ -13,7 +13,11 @@
   "scripts": {
     "start": "electron .",
     "build": "electron-builder",
-    "pack": "electron-builder --dir"
+    "pack": "electron-builder --dir",
+    "publish": "publish"
+  },
+  "updater": {
+    "url": "https://github.com/JosephusPaye/collel-video-downloader/blob/master/updates.json?raw=true"
   },
   "build": {
     "appId": "josephuspaye.collel-video-downloader",
@@ -29,17 +33,21 @@
     }
   },
   "dependencies": {
+    "electron-simple-updater": "^1.2.1",
     "electron-store": "^1.1.0",
     "humanize-duration": "^3.10.0",
     "pretty-bytes": "^4.0.2",
     "progress-stream": "^2.0.0",
+    "rimraf": "^2.6.1",
     "shortid": "^2.2.8",
     "yaku": "^0.18.0",
     "youtube-dl": "^1.11.1"
   },
   "devDependencies": {
+    "dotenv": "^4.0.0",
     "electron": "^1.6.11",
     "electron-builder": "^19.7.1",
-    "electron-builder-squirrel-windows": "^19.7.2"
+    "electron-builder-squirrel-windows": "^19.7.2",
+    "electron-simple-publisher": "^0.4.6"
   }
 }
