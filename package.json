@@ -25,11 +25,8 @@
       "target": "squirrel"
     },
     "squirrelWindows": {
-      "iconUrl": "https://raw.githubusercontent.com/JosephusPaye/collel-video-downloader/master/icons/app.ico"
+      "iconUrl": "https://github.com/JosephusPaye/collel-video-downloader/blob/master/build/icon.ico?raw=true"
     }
-  },
-  "updater": {
-    "url": "https://raw.githubusercontent.com/JosephusPaye/collel-video-downloader/master/updates.json"
   },
   "dependencies": {
     "electron-store": "^1.1.0",
