@@ -43,27 +43,33 @@ function handleCancel(download, downloadQueue) {
  * @param  {Array} downloadQueue  The download queue
  */
 function handle(data, downloads, downloadQueue) {
-	const result = findDownload(data.downloadId, downloads);
+	const item = findDownload(data.downloadId, downloads);
+	const itemOnQueue = findDownload(data.downloadId, downloadQueue.items);
 
-	if (!result) {
+	if (!item) {
 		return;
 	}
 
 	switch (data.selectedOptionId) {
 		case 'open':
-			ipcRenderer.send('open-item', result.download.filepath);
+			ipcRenderer.send('open-item', item.download.filepath);
 			break;
 		case 'open-in-browser':
-			ipcRenderer.send('open-external', result.download.url);
+			ipcRenderer.send('open-external', item.download.url);
 			break;
 		case 'show-in-folder':
-			ipcRenderer.send('show-item-in-folder', result.download.filepath);
+			ipcRenderer.send('show-item-in-folder', item.download.filepath);
 			break;
 		case 'remove-from-list':
-			downloads.splice(result.index, 1);
+			downloads.splice(item.index, 1);
+
+			if (itemOnQueue) {
+				downloadQueue.items.splice(itemOnQueue.index, 1);
+			}
+
 			break;
 		case 'cancel':
-			handleCancel(result.download, downloadQueue);
+			handleCancel(item.download, downloadQueue);
 			break;
 	}
 }
