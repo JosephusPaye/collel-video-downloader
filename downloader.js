@@ -8,7 +8,8 @@ const youtubeDl = require('youtube-dl');
 // Default download options
 const defaultOptions = {
     directory: path.join(__dirname, 'downloads'),
-    args: []
+    args: [],
+    binDir: path.join(require('electron').remote.app.getPath('userData'), 'bin')
 };
 
 /**
@@ -18,12 +19,13 @@ const defaultOptions = {
  * @param  {String} options.directory  The path to set as youtube-dl's working directory
  * @param  {String} options.filename   The output filename
  * @param  {Array}  options.args       Args to pass to youtube-dl. Format: ['--format=22', '...']
+ * @param  {Array}  options.binDir     The directory that has the youtube-dl binary
  * @return {Stream}                    The download progress stream
  */
 function download(url, options = {}) {
     options = Object.assign({}, defaultOptions, options);
 
-    const execOptions = { cwd: options.directory };
+    const execOptions = { cwd: options.directory, binDir: options.binDir };
     const downloadPath = path.join(
         options.directory,
         options.filename ? options.filename : (shortId.generate() + '.part')
@@ -118,13 +120,16 @@ function download(url, options = {}) {
 /**
  * Get the info of the video at the given url
  *
- * @param  {String} url   The URL of the video
- * @param  {Array}  args  Args to pass to youtube-dl. Format: ['--format=22', '...']
+ * @param  {String} url             The URL of the video
+ * @param  {Array}  options.args    Args to pass to youtube-dl. Format: ['--format=22', '...']
+ * @param  {Array}  options.binDir  The directory that has the youtube-dl binary
  * @return {Promise}
  */
-function getInfo(url, args = []) {
+function getInfo(url, options) {
+    options = Object.assign({}, defaultOptions, options);
+
     return new Promise((resolve, reject) => {
-        youtubeDl.getInfo(url, args, (err, info) => {
+        youtubeDl.getInfo(url, options.args, { binDir: options.binDir }, (err, info) => {
             if (err) {
                 return reject(err);
             }

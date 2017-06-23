@@ -41,7 +41,7 @@
     "rimraf": "^2.6.1",
     "shortid": "^2.2.8",
     "yaku": "^0.18.0",
-    "youtube-dl": "^1.11.1"
+    "youtube-dl": "github:JosephusPaye/node-youtube-dl"
   },
   "devDependencies": {
     "dotenv": "^4.0.0",
