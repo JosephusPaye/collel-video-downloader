@@ -94,6 +94,9 @@ class DownloadQueue {
 
                 // Remove the download from list of downloads
                 this.downloads = this.downloads.filter(d => d.uid !== item.uid);
+
+                // Move on to the next item
+                this.next();
             });
 
         download.uid = item.uid;
