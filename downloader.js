@@ -25,7 +25,12 @@ const defaultOptions = {
 function download(url, options = {}) {
     options = Object.assign({}, defaultOptions, options);
 
-    const execOptions = { cwd: options.directory, binDir: options.binDir };
+    const execOptions = {
+        cwd: options.directory,
+        binDir: options.binDir,
+        maxBuffer: 1024 * (1024 * 2) // 2MB
+    };
+
     const downloadPath = path.join(
         options.directory,
         options.filename ? options.filename : (shortId.generate() + '.part')
@@ -129,7 +134,12 @@ function getInfo(url, options) {
     options = Object.assign({}, defaultOptions, options);
 
     return new Promise((resolve, reject) => {
-        youtubeDl.getInfo(url, options.args, { binDir: options.binDir }, (err, info) => {
+        const execOptions = {
+            binDir: options.binDir,
+            maxBuffer: 1024 * (1024 * 2) // 2MB
+        };
+
+        youtubeDl.getInfo(url, options.args, execOptions, (err, info) => {
             if (err) {
                 return reject(err);
             }
