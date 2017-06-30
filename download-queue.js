@@ -89,6 +89,8 @@ class DownloadQueue {
                 this.downloads = this.downloads.filter(d => d.uid !== item.uid);
             })
             .on('error', err => {
+                console.error('Error downloading video in queue', err);
+
                 item.hasError = true;
                 item.status = 'Error';
 
