@@ -1,3 +1,5 @@
+const fs = require('fs');
+const mkdirp = require('mkdirp');
 const downloader = require('./downloader');
 
 /**
@@ -22,6 +24,22 @@ class DownloadQueue {
 
         // The list of items waiting to download
         this.items = [];
+
+        // Ensure that the download directory exists
+        this.ensureDownloadDirectory();
+    }
+
+    /**
+     * Check that the download directory exists, and (attempt to) create it if not
+     */
+    ensureDownloadDirectory() {
+        // TODO: Check read/write permissions and handle errors gracefully or alert user
+        fs.access(this.downloadDirectory, (err) => {
+            if (err) {
+                // TODO: Handle potential errors
+                mkdirp(this.downloadDirectory);
+            }
+        });
     }
 
     /**
