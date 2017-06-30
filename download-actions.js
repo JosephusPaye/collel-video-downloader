@@ -71,6 +71,11 @@ function handle(data, downloads, downloadQueue) {
 		case 'cancel':
 			handleCancel(item.download, downloadQueue);
 			break;
+		case 'retry':
+			return {
+				retry: true,
+				download: item.download
+			};
 	}
 }
 

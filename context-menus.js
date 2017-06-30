@@ -40,6 +40,12 @@ function createMenu(menuId, hasSelection = false, onClick) {
         click: onClick
     };
 
+    const retry = {
+        id: 'retry',
+        label: 'Retry',
+        click: onClick
+    };
+
     const separator = {
         type: 'separator'
     };
@@ -65,9 +71,10 @@ function createMenu(menuId, hasSelection = false, onClick) {
         case 'downloadConnecting':
             return Menu.buildFromTemplate([openInBrowser]);
         case 'downloadQueued':
+            return Menu.buildFromTemplate([removeFromList, separator, openInBrowser]);
         case 'downloadError':
         case 'downloadCancelled':
-            return Menu.buildFromTemplate([removeFromList, separator, openInBrowser]);
+            return Menu.buildFromTemplate([retry, removeFromList, separator, openInBrowser]);
         case 'downloadInProgress':
             return Menu.buildFromTemplate([showInFolder, cancel, separator, openInBrowser]);
         case 'downloadComplete':

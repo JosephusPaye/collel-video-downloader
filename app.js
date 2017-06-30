@@ -38,7 +38,7 @@ const vm = new Vue({
                 'Queued': 'downloadQueued',
                 'Downloading': 'downloadInProgress',
                 'Complete': 'downloadComplete',
-                'Error': 'downloadErrors',
+                'Error': 'downloadError',
                 'Cancelled': 'downloadCancelled'
             }
         };
@@ -62,14 +62,14 @@ const vm = new Vue({
     },
 
     methods: {
-        download(args = []) {
-            if (this.input.trim().length === 0) {
+        download(url = this.input, args = []) {
+            if (url.trim().length === 0) {
                 return;
             }
 
             this.fetchingInfo = true;
 
-            downloader.getInfo(this.input, { args: args })
+            downloader.getInfo(url, { args: args })
                 .then(info => {
                     this.input = '';
                     [].concat(info).forEach(item => { this.addDownload(item, args); });
@@ -81,7 +81,7 @@ const vm = new Vue({
         },
 
         downloadAudio() {
-            this.download(['-f=mp3/m4a/bestaudio']);
+            this.download(this.input, ['-f=mp3/m4a/bestaudio']);
         },
 
         getVideoUrl() {
@@ -171,8 +171,12 @@ const vm = new Vue({
             });
         },
 
-        onContextMenuItemSelect(event, data) {
-            downloadAction.handle(data, this.downloads, downloadQueue);
+        onContextMenuItemSelect(event, eventData) {
+            const result = downloadAction.handle(eventData, this.downloads, downloadQueue);
+
+            if (result && result.retry) {
+                this.addDownload(result.download.info, result.download.args);
+            }
         },
 
         updateYoutubeDl() {

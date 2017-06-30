@@ -132,6 +132,18 @@ strong {
     text-decoration: line-through;
 }
 
+.download.has-error {
+    color: red;
+}
+
+.download.has-error .download-index {
+    color: rgba(255, 0, 0, 0.7);
+}
+
+.download.has-error .ui-progress-linear--color-primary {
+    background-color: rgba(243, 33, 33, 0.4);
+}
+
 .download-index {
     width: 32px;
     min-width: 32px;

@@ -58,7 +58,7 @@
                     <tbody>
                         <tr
                             class="download" v-for="(download, index) in downloads"
-                            :key="download.url" :class="{ 'is-cancelled': download.isCancelled }"
+                            :key="download.url" :class="{ 'is-cancelled': download.isCancelled, 'has-error': download.hasError }"
                             @contextmenu="onContextMenu(download)"
                         >
                             <td class="download-index">{{ index + 1 }}</td>
