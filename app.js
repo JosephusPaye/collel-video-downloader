@@ -3,6 +3,7 @@ const downloadAction = require('./download-actions');
 const downloader = require('./downloader');
 const downloadErrors = require('./download-errors');
 const DownloadQueue = require('./download-queue');
+const END_OF_LINE = require('os').EOL;
 const humanizer = require('./humanizer');
 const menu = require('./menus');
 const shortId = require('shortid');
@@ -93,7 +94,11 @@ const vm = new Vue({
 
             downloader.getInfo(this.input)
                 .then(info => {
-                    clipboard.writeText(info.fileurl);
+                    const text = Array.isArray(info)
+                        ? info.map(video => video.fileurl).join(END_OF_LINE)
+                        : info.fileurl;
+
+                    clipboard.writeText(text);
                     this.showUrlSuccess(info);
                 })
                 .catch(this.showUrlError)
@@ -124,11 +129,13 @@ const vm = new Vue({
         },
 
         showUrlSuccess(info) {
-            this.showDialog(
-                'Video URL copied',
-                'Download URL for video "' + info.title + '" has been copied to the clipboard.',
-                { type: 'info' }
-            );
+            const isMultiple = Array.isArray(info);
+            const title = isMultiple ? (info.length + ' video URLs copied') : 'Video URL copied';
+            const message = isMultiple
+                ? 'Download URLs for ' + info.length + ' videos on the playlist have been copied to the clipboard.'
+                : 'Download URL for video "' + info.title + '" has been copied to the clipboard.';
+
+            this.showDialog(title, message, { type: 'info' });
         },
 
         showUrlError(err) {
@@ -187,9 +194,9 @@ const vm = new Vue({
                     this.hideMessageOverlay();
 
                     const title = result.updated ? 'Downloader updated' : 'Up to date';
-                    const message = result.updated ?
-                        'Downloader was updated to version ' + result.version + '.' :
-                        'Downloader is already up to date. Current version: ' + result.version + '.'
+                    const message = result.updated
+                        ? 'Downloader was updated to version ' + result.version + '.'
+                        : 'Downloader is already up to date. Current version: ' + result.version + '.'
 
                     this.showDialog(title, message);
                 })
