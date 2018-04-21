@@ -18,7 +18,7 @@ function initialize(appDataDirectory) {
 
         downloadYoutubeDl(binPath, (err, result) => {
             if (err) {
-                return reject(error);
+                return reject(err);
             }
 
             const details = {
