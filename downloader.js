@@ -28,7 +28,7 @@ function download(url, options = {}) {
     const execOptions = {
         cwd: options.directory,
         binDir: options.binDir,
-        maxBuffer: 1024 * (1024 * 2) // 2MB
+        maxBuffer: Infinity // Unlimited stdout/stderr buffer
     };
 
     const downloadPath = path.join(
@@ -136,7 +136,7 @@ function getInfo(url, options) {
     return new Promise((resolve, reject) => {
         const execOptions = {
             binDir: options.binDir,
-            maxBuffer: 1024 * (1024 * 2) // 2MB
+            maxBuffer: Infinity // Unlimited stdout/stderr buffer
         };
 
         youtubeDl.getInfo(url, options.args, execOptions, (err, info) => {
