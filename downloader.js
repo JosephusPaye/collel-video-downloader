@@ -8,7 +8,7 @@ const youtubeDl = require('youtube-dl');
 // Default download options
 const defaultOptions = {
     directory: path.join(__dirname, 'downloads'),
-    args: [],
+    args: ['--no-check-certificate'], // Temp fix for cert invalid issues
     binDir: path.join(require('electron').remote.app.getPath('userData'), 'bin')
 };
 
@@ -24,6 +24,7 @@ const defaultOptions = {
  */
 function download(url, options = {}) {
     options = Object.assign({}, defaultOptions, options);
+    options.args = (options.args || []).concat(defaultOptions.args);
 
     const execOptions = {
         cwd: options.directory,
@@ -132,6 +133,7 @@ function download(url, options = {}) {
  */
 function getInfo(url, options) {
     options = Object.assign({}, defaultOptions, options);
+    options.args = (options.args || []).concat(defaultOptions.args);
 
     return new Promise((resolve, reject) => {
         const execOptions = {
