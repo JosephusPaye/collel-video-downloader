@@ -2,7 +2,7 @@
   "name": "collel-video-downloader",
   "productName": "Collel Video Downloader",
   "description": "Online video downloader, useful for quickly downloading videos from sites like YouTube, Vimeo and more. Powered by youtube-dl.",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "main": "main.js",
   "author": "Josephus Paye II",
   "private": true,
